@@ -1,0 +1,86 @@
+def calculate_financial_need(net_worth, max_net_worth):
+    return net_worth / max_net_worth if max_net_worth != 0 else 0
+
+
+def calculate_motive_score(characteristics):
+    motive_weights = {
+        'rude': 0.5,
+        'quiet': 0.3,
+        'playful': 0.2,
+        'animal lover': 0.1,
+        'retired army': 0.2
+    }
+    motive_score = sum(motive_weights[characteristic] for characteristic in characteristics)
+    return motive_score
+
+
+def determine_suspect(suspects):
+    max_net_worth = max(details['net_worth'] for details in suspects.values())
+
+    scores = {}
+    for suspect, details in suspects.items():
+        motive_score = calculate_motive_score(details['characteristics'])
+        financial_need = calculate_financial_need(details['net_worth'], max_net_worth)
+        relationship_label = details['relationship']
+        
+        relationship_weights = {
+            'son': 0.5,
+            'daughter': 0.4,
+            'brother': 0.3,
+            'sister': 0.3,
+            'uncle': 0.2
+        }
+        relationship_score = relationship_weights.get(relationship_label, 0)  # Default to 0 if relationship not found
+        
+        overall_score = (motive_score * 0.4) + (financial_need * 0.3) + (relationship_score * 0.3)
+        scores[suspect] = overall_score
+
+    primary_suspect = max(scores, key=scores.get)
+    return primary_suspect, scores
+
+
+# Example data with separate dictionaries for characteristics and relationships
+suspects = {
+    'Jones': {
+        'characteristics': ['rude'],
+        'net_worth': 1000000,
+        'relationship': 'son'
+    },
+    'Jenna': {
+        'characteristics': ['quiet'],
+        'net_worth': 700000,
+        'relationship': 'daughter'
+    },
+    'Peter': {
+        'characteristics': ['animal lover'],
+        'net_worth': 50000,
+        'relationship': 'brother'
+    },
+    'Penelope': {
+        'characteristics': ['playful'],
+        'net_worth': 500000,
+        'relationship': 'sister'
+    },
+    'Will': {
+        'characteristics': ['retired army'],
+        'net_worth': 10000,
+        'relationship': 'uncle'
+    }
+}
+
+primary_suspect, scores = determine_suspect(suspects)
+
+print("Overall Suspect Scores:")
+for suspect, score in scores.items():
+    print("Suspect:", suspect)
+    print("Score:", score)
+    print()
+
+characteristics = suspects[primary_suspect]['characteristics']
+characteristics_string = ', '.join(characteristics)
+
+print("Based on the Overall Suspect Scores, the person that most likely killed Mr Marshall is:")
+print("Name:", primary_suspect)
+print("Characteristics:", characteristics_string)
+print("Net Worth:", suspects[primary_suspect]['net_worth'])
+print("Relationship:", suspects[primary_suspect]['relationship'])
